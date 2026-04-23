@@ -22,6 +22,14 @@
     "experimentalTernaries": false,
     "objectWrap": "preserve",
     "experimentalOperatorPosition": "end",
-    "filepath": "c:\\Users\\Pichau\\OneDrive\\Documentos\\Projetos\\prostore\\types\\index.ts",
-    "parser": "typescript"
+    "filepath": "c:\\Users\\Pichau\\OneDrive\\Documentos\\Projetos\\prostore\\.prettierrc",
+    "parser": "typescript",
+    "overrides": [
+    {
+      "files": "*.tsx",
+      "options": {
+        "parser": "typescript"
+      }
+    }
+  ]
 }
