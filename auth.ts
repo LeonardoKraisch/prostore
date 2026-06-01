@@ -1,9 +1,9 @@
 import NextAuth from "next-auth";
-import { PrismaAdapter } from "@next-auth/prisma-adapter";
+import { PrismaAdapter } from "@auth/prisma-adapter";
 import { prisma } from "@/db/prisma";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { email } from "zod";
 import { compareSync } from "bcrypt-ts-edge";
+import type { NextAuthConfig } from "next-auth";
 
 export const config = {
   pages: {
@@ -48,6 +48,18 @@ export const config = {
 
     // Add your authentication providers here (e.g., Google, GitHub, etc.)
   ],
-};
+  callbacks: {
+    async session({ session, token, user, trigger }) {
+      // token.sub can be undefined, provide a safe fallback to satisfy the string type
+      session.user.id = token.sub ?? "";
+
+      if (trigger === "update") {
+        session.user.name = user.name;
+      }
+
+      return session;
+    },
+  },
+} satisfies NextAuthConfig;
 
 export const { handlers, auth, signIn, signOut } = NextAuth(config);
