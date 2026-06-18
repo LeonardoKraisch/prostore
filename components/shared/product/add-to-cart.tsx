@@ -1,41 +1,85 @@
 "use client";
 import { Button } from "@/components/ui/button";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
-import { CartItemProps } from "@/types";
+import { Plus, Minus, Loader } from "lucide-react";
+import { CartProps, CartItemProps } from "@/types";
 import { useToast } from "@/hooks/use-toast";
 import { ToastAction } from "@/components/ui/toast";
-import { addItemToCart } from "@/lib/actions/cart.actions";
+import { addItemToCart, removeItemFromCart } from "@/lib/actions/cart.actions";
+import { useTransition } from "react";
 
-const AddToCart = ({ item }: { item: CartItemProps }) => {
+const AddToCart = ({
+  cart,
+  item,
+}: {
+  cart?: CartProps;
+  item: CartItemProps;
+}) => {
   const router = useRouter();
   const { toast } = useToast();
 
+  const [isPending, startTransition] = useTransition();
+
   const handleAddToCart = async () => {
-    const response = await addItemToCart(item);
-    if (!response.success) {
+    startTransition(async () => {
+      const response = await addItemToCart(item);
+      if (!response.success) {
+        toast({
+          variant: "destructive",
+          description: response.message,
+        });
+        return;
+      }
       toast({
-        variant: "destructive",
+        description: response.message,
+        action: (
+          <ToastAction
+            className="bg-primary text-white hover:bg-gray-800"
+            altText="View Cart"
+            onClick={() => router.push("/cart")}
+          >
+            View Cart
+          </ToastAction>
+        ),
+      });
+    });
+  };
+
+  const handleRemoveFromCart = async () => {
+    startTransition(async () => {
+      const response = await removeItemFromCart(item.productId);
+      toast({
+        variant: response.success ? "default" : "destructive",
         description: response.message,
       });
       return;
-    }
-    toast({
-      description: `${item.name} added to cart`,
-      action: (
-        <ToastAction
-          className="bg-primary text-white hover:bg-gray-800"
-          altText="View Cart"
-          onClick={() => router.push("/cart")}
-        >
-          View Cart
-        </ToastAction>
-      ),
     });
   };
-  return (
+
+  const existItem =
+    cart && cart.items.find((x) => x.productId === item.productId);
+  return existItem ? (
+    <div>
+      <Button variant="outline" type="button" onClick={handleRemoveFromCart}>
+        {isPending ? (
+          <Loader className="w-4 h-4 animate-spin" />
+        ) : (
+          <Minus className="h-4 w-4" />
+        )}
+      </Button>
+      <span className="px-2">{existItem.quantity}</span>
+      <Button variant="outline" type="button" onClick={handleAddToCart}>
+        {isPending ? (
+          <Loader className="w-4 h-4 animate-spin" />
+        ) : (
+          <Plus className="h-4 w-4" />
+        )}
+      </Button>
+    </div>
+  ) : (
     <Button className="w-full" type="button" onClick={handleAddToCart}>
-      <Plus /> Add to Cart
+      {isPending ? <Loader className="w-4 h-4 animate-spin" /> : <Plus />} Add
+      to Cart
     </Button>
   );
 };
