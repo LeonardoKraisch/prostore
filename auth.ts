@@ -113,6 +113,23 @@ export const config = {
     },
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     authorized({ request, auth }: any) {
+      const protectedPaths = [
+        /\/shipping-address/,
+        /\/payment-method/,
+        /\/place-order/,
+        /\/profile/,
+        /\/user\/(.*)/,
+        /\/order\/(.*)/,
+        /\/admin/,
+      ]
+      
+      const {pathname} = request.nextUrl;
+      
+      const isProtectedPath = protectedPaths.some((path) => path.test(pathname));
+      if(!auth && isProtectedPath) {
+        return false;
+      }
+
       if (!request.cookies.get("sessionCartId")) {
         const sessionCartId = crypto.randomUUID();
 
