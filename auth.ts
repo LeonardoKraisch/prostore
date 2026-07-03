@@ -68,6 +68,7 @@ export const config = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     async jwt({ token, user, trigger, session }: any) {
       if (user) {
+        token.id = user.id;
         token.role = user.role;
 
         if (user.name === "NO_NAME") {
@@ -80,6 +81,33 @@ export const config = {
             name: token.name,
           },
         });
+      }
+
+      if (trigger === "signIn" || trigger === "update"){
+        const cookiesObject = await cookies();
+        const sessionCartId = cookiesObject.get("sessionCartId")?.value;
+
+        if(sessionCartId){
+         const sessionCart = await prisma.cart.findFirst({
+            where: {
+              sessionCartId: sessionCartId,
+            },
+          });
+          if(sessionCart){
+            await prisma.cart.deleteMany({
+              where: { userId: user.id }
+            });
+
+            await prisma.cart.update({
+              where: {
+                id: sessionCart.id
+              },
+              data: {
+                userId: user.id
+              }
+            })
+          }
+        }
       }
       return token;
     },
