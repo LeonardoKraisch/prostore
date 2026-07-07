@@ -22,12 +22,12 @@ export type OrderProps = z.infer<typeof insertOrderSchema> & {
   id: string;
   createdAt: Date;
   isPaid: boolean;
-  paidAt: Date;
+  paidAt: Date | null;
   isDelivered: boolean;
-  deliveredAt: Date;
+  deliveredAt: Date | null;
   orderItems: OrderItemProps[];
   user: {
     name: string;
     email: string;
-  }
+  };
 };
