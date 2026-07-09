@@ -52,7 +52,7 @@ export function round2(value: number | string) {
 
 const CURRENCY_FORMATTER = new Intl.NumberFormat("en-US", {
   style: "currency",
-  currency: "USD",
+  currency: "BRL",
   minimumFractionDigits: 2,
 });
 
