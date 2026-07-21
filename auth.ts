@@ -74,34 +74,38 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         });
       }
 
-      if (trigger === "signIn" || trigger === "update"){
+      if (trigger === "signIn" || trigger === "update") {
         const cookiesObject = await cookies();
         const sessionCartId = cookiesObject.get("sessionCartId")?.value;
 
-        if(sessionCartId){
-         const sessionCart = await prisma.cart.findFirst({
+        if (sessionCartId) {
+          const sessionCart = await prisma.cart.findFirst({
             where: {
               sessionCartId: sessionCartId,
             },
           });
-          if(sessionCart){
+          if (sessionCart) {
             await prisma.cart.deleteMany({
-              where: { userId: user.id }
+              where: { userId: user.id },
             });
 
             await prisma.cart.update({
               where: {
-                id: sessionCart.id
+                id: sessionCart.id,
               },
               data: {
-                userId: user.id
-              }
-            })
+                userId: user.id,
+              },
+            });
           }
         }
       }
+
+      if (session?.user.name && trigger === "update") {
+        token.name = session.user.name;
+      }
+
       return token;
     },
   },
 });
-

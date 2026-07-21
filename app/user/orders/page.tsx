@@ -1,5 +1,78 @@
-const OrdersPage = () => {
-  return <div>OrdersPage</div>;
+import { Metadata } from "next";
+import { getMyOrders } from "@/lib/actions/order.actions";
+import { formatCurrency, formatDateTime, formatId } from "@/lib/utils";
+import Link from "next/link";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import Pagination from "@/components/shared/pagination";
+
+export const metadata: Metadata = {
+  title: "My Orders",
+};
+
+const OrdersPage = async (props: {
+  searchParams: Promise<{ page: string }>;
+}) => {
+  const page = Number((await props.searchParams).page) || 1;
+
+  const orders = await getMyOrders({ page });
+
+  return (
+    <div className="space-y-2">
+      <h2 className="h2-bold">Orders</h2>
+      <div className="overflow-x-auto">
+        <Table>
+          <TableHeader>
+            <TableHead>ID</TableHead>
+            <TableHead>Date</TableHead>
+            <TableHead>Total</TableHead>
+            <TableHead>Paid</TableHead>
+            <TableHead>Delivered</TableHead>
+            <TableHead>Actions</TableHead>
+          </TableHeader>
+          <TableBody>
+            {orders.data.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell>{formatId(order.id)}</TableCell>
+                <TableCell>
+                  {formatDateTime(order.createdAt).dateTime}
+                </TableCell>
+                <TableCell>{formatCurrency(order.totalPrice)}</TableCell>
+                <TableCell>
+                  {order.isPaid && order.paidAt
+                    ? "Paid at " + formatDateTime(order.paidAt).dateTime
+                    : "Not Paid"}
+                </TableCell>
+                <TableCell>
+                  {order.isDelivered && order.deliveredAt
+                    ? "Delivered at " +
+                      formatDateTime(order.deliveredAt).dateTime
+                    : "Not Delivered"}
+                </TableCell>
+                <TableCell>
+                  <Link
+                    className="text-blue-500 hover:underline"
+                    href={`/order/${order.id}`}
+                  >
+                    Details
+                  </Link>
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+        {orders.totalPages > 1 && (
+          <Pagination page={page || 1} totalPages={orders.totalPages} />
+        )}
+      </div>
+    </div>
+  );
 };
 
 export default OrdersPage;
