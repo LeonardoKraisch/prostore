@@ -11,6 +11,7 @@ import { prisma } from "@/db/prisma";
 import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
+import { Prisma } from "@/lib/generated/prisma";
 
 export async function createOrder() {
   try {
@@ -259,4 +260,80 @@ export async function getMyOrders({
     data,
     totalPages: Math.ceil(dataCount / limit),
   };
+}
+
+export async function getOrderSummary() {
+  //get counts for each resource
+  const ordersCount = await prisma.order.count();
+  const productsCount = await prisma.product.count();
+  const usersCount = await prisma.user.count();
+  //calculate the total sales
+  const totalSales = await prisma.order.aggregate({
+    _sum: {
+      totalPrice: true,
+    },
+  });
+  //get monthly sales
+  const monthlySales = await prisma.order.groupBy({
+    by: ["createdAt"],
+  });
+  //get latest sales
+  const salesDataRaw = await prisma.$queryRaw<
+    Array<{ month: string; totalSales: Prisma.Decimal }>
+  >`SELECT TO_CHAR("createdAt", 'MM/YY') AS "month", SUM("totalPrice") AS "totalSales"
+  FROM "Order"
+  GROUP BY TO_CHAR("createdAt", 'MM/YY');
+  `;
+
+  type SalesDataType = {
+    month: string;
+    totalSales: number;
+  }[];
+
+  const salesData: SalesDataType = salesDataRaw.map((entry) => ({
+    month: entry.month,
+    totalSales: Number(entry.totalSales),
+  }));
+
+  const latestSales = await prisma.order.findMany({
+    take: 6,
+    orderBy: { createdAt: "desc" },
+    include: { user: { select: { name: true } } },
+  });
+
+  return {
+    ordersCount,
+    productsCount,
+    usersCount,
+    totalSales,
+    monthlySales,
+    salesData,
+    latestSales,
+  };
+}
+
+export async function getAllOrders({
+  limit = PAGE_SIZE,
+  page,
+}: {
+  limit?: number;
+  page: number;
+}) {
+  try {
+    const data = await prisma.order.findMany({
+      orderBy: { createdAt: "desc" },
+      take: limit,
+      skip: (page - 1) * limit,
+      include: { user: { select: { name: true } } },
+    });
+
+    const dataCount = await prisma.order.count();
+
+    return {
+      data,
+      totalPages: Math.ceil(dataCount / limit),
+    };
+  } catch (error) {
+    return { success: false, message: formatError(error) };
+  }
 }

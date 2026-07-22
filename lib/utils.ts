@@ -67,6 +67,12 @@ export function formatCurrency(value: number | string | null) {
   }
 }
 
+const NUMBER_FORMATTER = new Intl.NumberFormat("en-US");
+
+export function formatNumber(value: number) {
+  return NUMBER_FORMATTER.format(value);
+}
+
 export function formatId(id: string) {
   return `..${id.substring(id.length - 6)}`;
 }
