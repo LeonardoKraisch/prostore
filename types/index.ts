@@ -12,6 +12,7 @@ import {
 export type ProductProps = z.infer<typeof insertProductSchema> & {
   id: string;
   rating: string;
+  numReviews: number;
   createdAt: Date;
 };
 

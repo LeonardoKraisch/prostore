@@ -22,15 +22,21 @@ import {
 import {
   approvePayPalOrder,
   createPayPalOrder,
+  updateOrderToPaidCOD,
+  deliverOrder,
 } from "@/lib/actions/order.actions";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { useTransition } from "react";
 
 const OrderDetailsTable = ({
   order,
   paypalClientId,
+  isAdmin,
 }: {
   order: OrderProps;
   paypalClientId: string;
+  isAdmin: boolean;
 }) => {
   const { toast } = useToast();
   const {
@@ -45,7 +51,6 @@ const OrderDetailsTable = ({
     isPaid,
     paidAt,
     deliveredAt,
-    createdAt,
     id,
   } = order;
 
@@ -77,6 +82,52 @@ const OrderDetailsTable = ({
       description: res.message,
       variant: res.success ? "default" : "destructive",
     });
+  };
+
+  const MarkAsPaidButton = () => {
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    return (
+      <Button
+        type="button"
+        disabled={isPending}
+        onClick={() =>
+          startTransition(async () => {
+            const res = await updateOrderToPaidCOD(order.id);
+            toast({
+              description: res.message,
+              variant: res.success ? "default" : "destructive",
+            });
+          })
+        }
+      >
+        {isPending ? "Processing..." : "Mark as Paid"}
+      </Button>
+    );
+  };
+
+  const MarkAsDeliveredButton = () => {
+    const [isPending, startTransition] = useTransition();
+    const { toast } = useToast();
+
+    return (
+      <Button
+        type="button"
+        disabled={isPending}
+        onClick={() =>
+          startTransition(async () => {
+            const res = await deliverOrder(order.id);
+            toast({
+              description: res.message,
+              variant: res.success ? "default" : "destructive",
+            });
+          })
+        }
+      >
+        {isPending ? "Processing..." : "Mark as Delivered"}
+      </Button>
+    );
   };
 
   return (
@@ -189,6 +240,12 @@ const OrderDetailsTable = ({
                   />
                 </PayPalScriptProvider>
               )}
+
+              {isAdmin && !isPaid && paymentMethod === "COD" && (
+                <MarkAsPaidButton />
+              )}
+
+              {isAdmin && !isDelivered && <MarkAsDeliveredButton />}
             </CardContent>
           </Card>
         </div>

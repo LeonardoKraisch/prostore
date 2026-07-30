@@ -1,3 +1,4 @@
+import { auth } from "@/auth";
 import { Metadata } from "next";
 import { getOrderById } from "@/lib/actions/order.actions";
 import { notFound } from "next/navigation";
@@ -13,6 +14,8 @@ const OrderDetailsPage = async (props: { params: Promise<{ id: string }> }) => {
   const order = await getOrderById(id);
   if (!order || "success" in order) notFound();
 
+  const session = await auth();
+
   return (
     <div>
       <OrderDetailsTable
@@ -21,6 +24,7 @@ const OrderDetailsPage = async (props: { params: Promise<{ id: string }> }) => {
           shippingAddress: order.shippingAddress as ShippingAddressProps,
         }}
         paypalClientId={(process.env.PAYPAL_CLIENT_ID as string) || "sb"}
+        isAdmin={session?.user?.role === "admin" || false}
       />
     </div>
   );
