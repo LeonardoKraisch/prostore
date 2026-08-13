@@ -12,7 +12,6 @@ import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@/lib/generated/prisma";
-import { success } from "zod";
 
 export async function createOrder() {
   try {

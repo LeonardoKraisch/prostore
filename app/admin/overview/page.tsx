@@ -3,7 +3,7 @@ import { auth } from "@/auth";
 import { getOrderSummary } from "@/lib/actions/order.actions";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { BadgeDollarSign, CreditCard, Users } from "lucide-react";
-import { formatCurrency, formatDateTime, formatNumber } from "@/lib/utils";
+import { formatCurrency, formatDateTime } from "@/lib/utils";
 import {
   Table,
   TableBody,

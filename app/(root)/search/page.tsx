@@ -2,14 +2,14 @@ import ProductCard from "@/components/shared/product/product-card";
 import { getAllProducts } from "@/lib/actions/product.actions";
 
 const SearchPage = async (props: {
-  searchParams: {
+  searchParams: Promise<{
     q?: string;
     category?: string;
     price?: string;
     rating?: string;
     sort?: string;
     page?: string;
-  };
+  }>;
 }) => {
   const {
     q = "all",
