@@ -130,3 +130,18 @@ export const updateUserSchema = updateProfileSchema.extend({
       path: ["role"],
     }),
 });
+
+export const insertReviewSchema = z.object({
+  title: z.string().min(3, "Title is required, at least 3 characters long"),
+  description: z
+    .string()
+    .min(3, "Description is required, at least 3 characters long"),
+  productId: z.string().min(1, "Product is required"),
+  userId: z.string().min(1, "User is required"),
+  rating: z
+    .number()
+    .int()
+    .min(1, "Rating must be at least 1")
+    .max(5, "Rating must be at most 5"),
+  isVerifiedPurchase: z.boolean(),
+});
