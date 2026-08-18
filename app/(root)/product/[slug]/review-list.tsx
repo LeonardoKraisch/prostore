@@ -1,8 +1,19 @@
 "use client";
-import { useState } from "react";
-import { Review } from "@/lib/generated/prisma";
+import { useEffect, useState } from "react";
+import { ReviewProps } from "@/types";
 import Link from "next/link";
 import ReviewForm from "./review-form";
+import { getReviews } from "@/lib/actions/review.actions";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { Calendar, User } from "lucide-react";
+import { formatDateTime } from "@/lib/utils";
+import Rating from "@/components/shared/product/reviews";
 
 const ReviewList = ({
   userId,
@@ -13,9 +24,20 @@ const ReviewList = ({
   productId: string;
   productSlug: string;
 }) => {
-  const [reviews, setReviews] = useState<Review[]>([]);
+  const [reviews, setReviews] = useState<ReviewProps[]>([]);
 
-  const handleReviewSubmited = () => {};
+  useEffect(() => {
+    const fetchReviews = async () => {
+      const data = await getReviews({ productId });
+      setReviews(data.data);
+    };
+    fetchReviews();
+  }, [productId]);
+
+  const handleReviewSubmited = async () => {
+    const res = await getReviews({ productId });
+    setReviews(res.data);
+  };
 
   return (
     <div className="space-y-4">
@@ -38,7 +60,31 @@ const ReviewList = ({
           to review this product
         </div>
       )}
-      <div className="flex flex-col gap-3"></div>
+      <div className="flex flex-col gap-3">
+        {reviews.map((review) => (
+          <Card key={review.id}>
+            <CardHeader>
+              <div className="flex-between">
+                <CardTitle>{review.title}</CardTitle>
+              </div>
+              <CardDescription>{review.description}</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="flex space-x-4 text-sm text-muted-foreground">
+                <Rating value={review.rating} />
+                <div className="flex items-center">
+                  <User className="mr-1 h-3 w-3" />
+                  {review.user ? review.user.name : "Deleted User"}
+                </div>
+                <div className="flex items-center">
+                  <Calendar className="mr-1 h-3 w-3" />
+                  {formatDateTime(review.createdAt).dateTime}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
     </div>
   );
 };
