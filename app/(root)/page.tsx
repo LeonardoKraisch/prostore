@@ -5,6 +5,7 @@ import {
   getLatestProducts,
   getFeaturedProducts,
 } from "@/lib/actions/product.actions";
+import IconBoxes from "@/components/icon-boxes";
 
 const Homepage = async () => {
   const latestProducts = await getLatestProducts();
@@ -17,6 +18,7 @@ const Homepage = async () => {
       )}
       <ProductList data={latestProducts} title="Newest Arrivals" />
       <ViewAllProductsButton />
+      <IconBoxes />
     </>
   );
 };
