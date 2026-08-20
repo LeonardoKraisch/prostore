@@ -33,6 +33,7 @@ export type OrderProps = z.infer<typeof insertOrderSchema> & {
     name: string;
     email: string;
   };
+  paymentResult: PaymentResultProps;
 };
 export type PaymentResultProps = z.infer<typeof paymentResultSchema>;
 

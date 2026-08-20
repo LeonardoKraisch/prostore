@@ -1,6 +1,10 @@
 "use server";
 
-import { CartItemProps, PaymentResultProps } from "@/types";
+import {
+  CartItemProps,
+  PaymentResultProps,
+  ShippingAddressProps,
+} from "@/types";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { auth } from "@/auth";
 import { convertToPlainObject, formatError } from "@/lib/utils";
@@ -12,6 +16,7 @@ import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@/lib/generated/prisma";
+import { sendPurchaseReceipt } from "@/email";
 
 export async function createOrder() {
   try {
@@ -232,6 +237,13 @@ export async function updateOrderToPaid({
   });
 
   if (!updatedOrder) throw new Error("Order not found");
+  sendPurchaseReceipt({
+    order: {
+      ...updatedOrder,
+      shippingAddress: updatedOrder.shippingAddress as ShippingAddressProps,
+      paymentResult: updatedOrder.paymentResult as PaymentResultProps,
+    },
+  });
   return updatedOrder;
 }
 
