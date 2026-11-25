@@ -8,13 +8,13 @@ const ProductPrice = ({
   className?: string;
 }) => {
   const stringPrice = price.toFixed(2);
-  const [dollars, cents] = stringPrice.split(".");
+  const [reais, cents] = stringPrice.split(".");
 
   return (
     <p className={cn("text-2xl", className)}>
-      <span className="text-xs align-super">$</span>
-      {dollars}
-      <span className="text-xs align-super">.{cents}</span>
+      <span className="text-xs align-super">R$</span>
+      {reais}
+      <span className="text-xs align-super">,{cents}</span>
     </p>
   );
 };

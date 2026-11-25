@@ -3,7 +3,6 @@
 import {
   CartItemProps,
   PaymentResultProps,
-  ShippingAddressProps,
 } from "@/types";
 import { isRedirectError } from "next/dist/client/components/redirect-error";
 import { auth } from "@/auth";
@@ -16,7 +15,8 @@ import { paypal } from "../paypal";
 import { revalidatePath } from "next/cache";
 import { PAGE_SIZE } from "../constants";
 import { Prisma } from "@/lib/generated/prisma";
-import { sendPurchaseReceipt } from "@/email";
+import { markOrderAsPaid } from "@/lib/order-payment";
+import { requireAdmin, requireAuth } from "@/lib/auth-guard";
 
 export async function createOrder() {
   try {
@@ -99,8 +99,10 @@ export async function createOrder() {
 
 export async function getOrderById(id: string) {
   try {
+    const session = await requireAuth();
+    const isAdmin = session.user.role === "admin";
     const order = await prisma.order.findFirst({
-      where: { id },
+      where: isAdmin ? { id } : { id, userId: session.user.id },
       include: {
         orderItems: true,
         user: { select: { name: true, email: true } },
@@ -116,8 +118,9 @@ export async function getOrderById(id: string) {
 
 export async function createPayPalOrder(orderId: string) {
   try {
+    const session = await requireAuth();
     const order = await prisma.order.findFirst({
-      where: { id: orderId },
+      where: { id: orderId, userId: session.user.id },
     });
     if (order) {
       const paypalOrder = await paypal.createOrder(Number(order.totalPrice));
@@ -151,10 +154,12 @@ export async function approvePayPalOrder(
   data: { orderID: string },
 ) {
   try {
+    const session = await requireAuth();
     const order = await prisma.order.findFirst({
-      where: { id: orderId },
+      where: { id: orderId, userId: session.user.id },
     });
     if (!order) throw new Error("Order not found");
+    if (order.isPaid) throw new Error("Order is already paid");
     const capturePayment = await paypal.capturePayment(data.orderID);
 
     if (
@@ -165,7 +170,7 @@ export async function approvePayPalOrder(
       throw new Error("PayPal payment not completed");
     }
 
-    await updateOrderToPaid({
+    await markOrderAsPaid({
       orderId,
       paymentResult: {
         id: capturePayment.id,
@@ -187,66 +192,6 @@ export async function approvePayPalOrder(
   }
 }
 
-export async function updateOrderToPaid({
-  orderId,
-  paymentResult,
-}: {
-  orderId: string;
-  paymentResult?: PaymentResultProps;
-}) {
-  const order = await prisma.order.findFirst({
-    where: { id: orderId },
-    include: {
-      orderItems: true,
-    },
-  });
-  if (!order) throw new Error("Order not found");
-  if (order.isPaid) throw new Error("Order is already paid");
-
-  await prisma.$transaction(async (tx) => {
-    for (const item of order.orderItems) {
-      await tx.product.update({
-        where: { id: item.productId },
-        data: {
-          stock: { decrement: item.quantity },
-        },
-      });
-    }
-
-    await tx.order.update({
-      where: { id: orderId },
-      data: {
-        isPaid: true,
-        paidAt: new Date(),
-        paymentResult,
-      },
-    });
-  });
-
-  const updatedOrder = await prisma.order.findFirst({
-    where: { id: orderId },
-    include: {
-      orderItems: true,
-      user: {
-        select: {
-          name: true,
-          email: true,
-        },
-      },
-    },
-  });
-
-  if (!updatedOrder) throw new Error("Order not found");
-  sendPurchaseReceipt({
-    order: {
-      ...updatedOrder,
-      shippingAddress: updatedOrder.shippingAddress as ShippingAddressProps,
-      paymentResult: updatedOrder.paymentResult as PaymentResultProps,
-    },
-  });
-  return updatedOrder;
-}
-
 export async function getMyOrders({
   limit = PAGE_SIZE,
   page,
@@ -254,8 +199,7 @@ export async function getMyOrders({
   limit?: number;
   page: number;
 }) {
-  const session = await auth();
-  if (!session) throw new Error("User is not authorized");
+  const session = await requireAuth();
 
   const data = await prisma.order.findMany({
     where: { userId: session?.user?.id },
@@ -275,6 +219,7 @@ export async function getMyOrders({
 }
 
 export async function getOrderSummary() {
+  await requireAdmin();
   //get counts for each resource
   const ordersCount = await prisma.order.count();
   const productsCount = await prisma.product.count();
@@ -345,6 +290,7 @@ export async function getAllOrders({
         }
       : {};
   try {
+    await requireAdmin();
     const data = await prisma.order.findMany({
       where: {
         ...queryFilter,
@@ -355,7 +301,7 @@ export async function getAllOrders({
       include: { user: { select: { name: true } } },
     });
 
-    const dataCount = await prisma.order.count();
+    const dataCount = await prisma.order.count({ where: { ...queryFilter } });
 
     return {
       data,
@@ -368,6 +314,7 @@ export async function getAllOrders({
 
 export async function deleteOrder(id: string) {
   try {
+    await requireAdmin();
     await prisma.order.delete({
       where: { id },
     });
@@ -380,7 +327,8 @@ export async function deleteOrder(id: string) {
 
 export async function updateOrderToPaidCOD(orderId: string) {
   try {
-    await updateOrderToPaid({ orderId });
+    await requireAdmin();
+    await markOrderAsPaid({ orderId });
     revalidatePath(`/order/${orderId}`);
     return { success: true, message: "Order paid successfully" };
   } catch (error) {
@@ -390,6 +338,7 @@ export async function updateOrderToPaidCOD(orderId: string) {
 
 export async function deliverOrder(orderId: string) {
   try {
+    await requireAdmin();
     const order = await prisma.order.findFirst({
       where: { id: orderId },
     });

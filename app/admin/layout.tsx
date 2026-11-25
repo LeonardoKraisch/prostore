@@ -5,12 +5,20 @@ import Link from "next/link";
 import Menu from "@/components/shared/header/menu";
 import MainNav from "./main-nav";
 import { AdminSearch } from "@/components/admin/admin-search";
+import { requireAdmin } from "@/lib/auth-guard";
+import { redirect } from "next/navigation";
 
-export default function UserLayout({
+export default async function AdminLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  try {
+    await requireAdmin();
+  } catch {
+    redirect("/unauthorized");
+  }
+
   return (
     <div>
       <div className="flex flex-col">

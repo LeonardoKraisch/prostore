@@ -4,6 +4,7 @@ import "../assets/styles/globals.css";
 import { APP_DESCRIPTION, APP_NAME, SERVER_URL } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
 import { Toaster } from "@/components/ui/toaster";
+import DemoBanner from "@/components/shared/demo-banner";
 
 const inter = localFont({
   src: [
@@ -18,11 +19,18 @@ const inter = localFont({
 
 export const metadata: Metadata = {
   title: {
-    template: `%s | Prostore`,
+    template: `%s | ${APP_NAME}`,
     default: APP_NAME,
   },
   description: `${APP_DESCRIPTION}`,
   metadataBase: new URL(SERVER_URL),
+  openGraph: {
+    type: "website",
+    siteName: APP_NAME,
+    title: APP_NAME,
+    description: APP_DESCRIPTION,
+    url: SERVER_URL,
+  },
 };
 
 export default function RootLayout({
@@ -39,6 +47,7 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
+          <DemoBanner />
           {children}
           <Toaster />
         </ThemeProvider>

@@ -9,6 +9,27 @@ import { getMyCart } from "@/lib/actions/cart.actions";
 import ReviewList from "./review-list";
 import { auth } from "@/auth";
 import Rating from "@/components/shared/product/reviews";
+import type { Metadata } from "next";
+
+export async function generateMetadata(props: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await props.params;
+  const product = await getProductBySlug(slug);
+  if (!product) return { title: "Product Not Found" };
+
+  return {
+    title: product.name,
+    description: product.description.slice(0, 160),
+    alternates: { canonical: `/product/${product.slug}` },
+    openGraph: {
+      title: product.name,
+      description: product.description.slice(0, 160),
+      images: product.images[0] ? [{ url: product.images[0] }] : [],
+      type: "website",
+    },
+  };
+}
 
 const ProductDetailsPage = async (props: {
   params: Promise<{ slug: string }>;

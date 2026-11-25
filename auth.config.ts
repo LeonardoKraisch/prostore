@@ -12,7 +12,7 @@ export const authConfig = {
   },
   providers: [], // Empty array to satisfy NextAuthConfig, will be populated in auth.ts
   callbacks: {
-    authorized({ request, auth }: any) {
+    authorized({ request, auth }) {
       const protectedPaths = [
         /\/shipping-address/,
         /\/payment-method/,
@@ -41,7 +41,13 @@ export const authConfig = {
           },
         });
 
-        response.cookies.set("sessionCartId", sessionCartId);
+        response.cookies.set("sessionCartId", sessionCartId, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === "production",
+          sameSite: "lax",
+          path: "/",
+          maxAge: 30 * 24 * 60 * 60, // 30 days
+        });
 
         return response;
       } else {

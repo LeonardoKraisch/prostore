@@ -21,11 +21,15 @@ const OrderDetailsPage = async (props: { params: Promise<{ id: string }> }) => {
 
   if (order.paymentMethod === "Stripe" && !order.isPaid) {
     const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!);
-    const paymentIntent = await stripe.paymentIntents.create({
-      amount: Math.round(Number(order.totalPrice) * 100),
-      currency: "brl",
-      metadata: { orderId: order.id },
-    });
+    // A chave de idempotência evita criar um PaymentIntent novo a cada visita.
+    const paymentIntent = await stripe.paymentIntents.create(
+      {
+        amount: Math.round(Number(order.totalPrice) * 100),
+        currency: "brl",
+        metadata: { orderId: order.id },
+      },
+      { idempotencyKey: `order-${order.id}` },
+    );
 
     client_secret = paymentIntent.client_secret as string;
   }

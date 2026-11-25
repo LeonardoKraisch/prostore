@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
-import { updateOrderToPaid } from "@/lib/actions/order.actions";
+import { markOrderAsPaid } from "@/lib/order-payment";
 
 export async function POST(req: NextRequest) {
   const payload = await req.text();
@@ -30,13 +30,13 @@ export async function POST(req: NextRequest) {
     try {
       const { object } = event.data as any;
 
-      await updateOrderToPaid({
+      await markOrderAsPaid({
         orderId: object.metadata.orderId as string,
         paymentResult: {
           id: object.id,
           status: "COMPLETED",
           email: object.billing_details?.email || "",
-          pricePaid: (object.amount / 100).toFixed(),
+          pricePaid: (object.amount / 100).toFixed(2),
         },
       });
 

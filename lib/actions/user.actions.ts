@@ -17,6 +17,21 @@ import z from "zod";
 import { PAGE_SIZE } from "../constants";
 import { revalidatePath } from "next/cache";
 import { Prisma } from "../generated/prisma";
+import { requireAdmin } from "@/lib/auth-guard";
+
+// Nunca devolver o hash da senha para o cliente.
+const userPublicSelect = {
+  id: true,
+  name: true,
+  email: true,
+  emailVerified: true,
+  image: true,
+  role: true,
+  address: true,
+  paymentMethod: true,
+  createdAt: true,
+  updatedAt: true,
+} satisfies Prisma.UserSelect;
 
 export async function signInWithCredentials(
   prevState: unknown,
@@ -79,9 +94,15 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 }
 
 export async function getUserById(id: string) {
+  const session = await auth();
+  if (!session?.user?.id) throw new Error("User is not authenticated");
+  if (session.user.id !== id && session.user.role !== "admin") {
+    throw new Error("User is not authorized");
+  }
   try {
     const user = await prisma.user.findFirst({
       where: { id },
+      select: userPublicSelect,
     });
     return user;
   } catch {
@@ -186,22 +207,26 @@ export async function getAllUsers({
           } as Prisma.StringFilter,
         }
       : {};
+  await requireAdmin();
   const data = await prisma.user.findMany({
     where: {
       ...queryFilter,
     },
+    select: userPublicSelect,
     orderBy: { createdAt: "desc" },
     take: limit,
     skip: (page - 1) * limit,
   });
 
-  const dataCount = await prisma.user.count();
+  const dataCount = await prisma.user.count({ where: { ...queryFilter } });
 
   return { data, totalPages: Math.ceil(dataCount / limit) };
 }
 
 export async function deleteUser(id: string) {
   try {
+    const session = await requireAdmin();
+    if (session.user.id === id) throw new Error("You cannot delete yourself");
     const userExists = await prisma.user.findUnique({
       where: { id },
     });
@@ -221,8 +246,10 @@ export async function deleteUser(id: string) {
   }
 }
 
-export async function updateUser(user: z.infer<typeof updateUserSchema>) {
+export async function updateUser(data: z.infer<typeof updateUserSchema>) {
   try {
+    await requireAdmin();
+    const user = updateUserSchema.parse(data);
     await prisma.user.update({
       where: { id: user.id },
       data: {

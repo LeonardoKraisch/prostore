@@ -22,7 +22,7 @@ const Charts = ({
           fontSize={12}
           tickLine={false}
           axisLine={false}
-          tickFormatter={(value) => `$${value}`}
+          tickFormatter={(value) => `R$${value}`}
         />
         <Bar
           dataKey="totalSales"

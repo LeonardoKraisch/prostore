@@ -37,13 +37,23 @@ export async function addItemToCart(data: CartItemProps) {
 
     const cart = await getMyCart();
 
-    const item = cartItemSchema.parse(data);
+    const { productId } = cartItemSchema.pick({ productId: true }).parse(data);
 
     const product = await prisma.product.findFirst({
-      where: { id: item.productId },
+      where: { id: productId },
     });
 
     if (!product) throw new Error("Product not found");
+
+    // Nunca confiar em preço/nome/imagem vindos do navegador.
+    const item: CartItemProps = cartItemSchema.parse({
+      productId: product.id,
+      name: product.name,
+      slug: product.slug,
+      image: product.images[0],
+      price: product.price,
+      quantity: 1,
+    });
 
     if (!cart) {
       const newCart = insertCartSchema.parse({
@@ -72,6 +82,7 @@ export async function addItemToCart(data: CartItemProps) {
           throw new Error("Not enough stock");
         }
         existItem.quantity = existItem.quantity + 1;
+        existItem.price = product.price;
       } else {
         if (product.stock < 1) throw new Error("Not enough stock");
 
