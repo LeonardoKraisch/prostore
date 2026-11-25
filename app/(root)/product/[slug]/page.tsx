@@ -1,8 +1,7 @@
-import { Badge } from "@/components/ui/badge";
-import { Card, CardContent } from "@/components/ui/card";
+import Link from "next/link";
+import { formatCurrency } from "@/lib/utils";
 import { notFound } from "next/navigation";
 import { getProductBySlug } from "@/lib/actions/product.actions";
-import ProductPrice from "@/components/shared/product/product-price";
 import ProductImages from "@/components/shared/product/product-images";
 import AddToCart from "@/components/shared/product/add-to-cart";
 import { getMyCart } from "@/lib/actions/cart.actions";
@@ -43,75 +42,91 @@ const ProductDetailsPage = async (props: {
   const session = await auth();
   const userId = session?.user?.id;
 
+  const inStock = product.stock > 0;
+
   return (
     <>
-      <section>
-        <div className="grid grid-cols-1 md:grid-cols-5">
-          {/* Images column */}
-          <div className="col-span-2">
-            <ProductImages images={product.images} />
-          </div>
-          {/* Details column */}
-          <div className="col-span-2 p-5">
-            <div className="flex flex-col gap-6">
-              <p>
-                {product.brand} {product.category}
-              </p>
-              <h1 className="h3-bold">{product.name}</h1>
-              <Rating value={Number(product.rating)} />
-              <p>{product.numReviews} reviews</p>
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-                <ProductPrice
-                  price={Number(product.price)}
-                  className="w-24 rounded-full bg-green-100 text-green-700 px-5 py-2"
-                />
-              </div>
+      <nav aria-label="Breadcrumb" className="mb-6 text-sm text-muted-foreground">
+        <Link href="/search" className="hover:text-foreground">
+          Shop
+        </Link>
+        <span className="mx-2" aria-hidden>
+          /
+        </span>
+        <Link
+          href={`/search?category=${encodeURIComponent(product.category)}`}
+          className="hover:text-foreground"
+        >
+          {product.category}
+        </Link>
+      </nav>
+
+      <section className="grid gap-10 md:grid-cols-[1.15fr_1fr] lg:gap-16">
+        <ProductImages images={product.images} name={product.name} />
+
+        <div className="md:pt-4">
+          <p className="text-sm text-muted-foreground">{product.brand}</p>
+          <h1 className="mt-1 font-display text-3xl font-bold leading-tight tracking-tight text-primary lg:text-4xl">
+            {product.name}
+          </h1>
+          <a
+            href="#reviews"
+            className="mt-3 inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground"
+          >
+            <Rating value={Number(product.rating)} size="sm" />
+            {product.numReviews}{" "}
+            {product.numReviews === 1 ? "review" : "reviews"}
+          </a>
+
+          <p className="mt-6 font-display text-3xl font-semibold">
+            {formatCurrency(product.price)}
+          </p>
+          <p
+            className={
+              inStock
+                ? "mt-1 text-sm text-muted-foreground"
+                : "mt-1 text-sm font-medium text-destructive"
+            }
+          >
+            {inStock
+              ? product.stock <= 5
+                ? `Only ${product.stock} left in stock`
+                : "In stock"
+              : "Sold out"}
+          </p>
+
+          {inStock && (
+            <div className="mt-6 max-w-sm">
+              <AddToCart
+                cart={cart}
+                item={{
+                  productId: product.id,
+                  name: product.name,
+                  slug: product.slug,
+                  price: product.price,
+                  quantity: 1,
+                  image: product.images![0],
+                }}
+              />
             </div>
-            <div className="mt-10">
-              <p className="font-semibold">Description</p>
-              <p>{product.description}</p>
-            </div>
+          )}
+
+          <div className="mt-10 border-t pt-6">
+            <h2 className="font-medium">About this shirt</h2>
+            <p className="mt-2 max-w-prose leading-relaxed text-muted-foreground">
+              {product.description}
+            </p>
           </div>
-          {/* Actions column */}
-          <div>
-            <Card>
-              <CardContent className="p-4">
-                <div className="mb-2 flex justify-between">
-                  <div>Price</div>
-                  <div>
-                    <ProductPrice price={Number(product.price)} />
-                  </div>
-                </div>
-                <div className="mb-2 flex justify-between">
-                  <div>Status</div>
-                  {product.stock > 0 ? (
-                    <Badge variant="outline">In Stock</Badge>
-                  ) : (
-                    <Badge variant="destructive">Out of Stock</Badge>
-                  )}
-                </div>
-                {product.stock > 0 && (
-                  <div className="flex-center">
-                    <AddToCart
-                      cart={cart}
-                      item={{
-                        productId: product.id,
-                        name: product.name,
-                        slug: product.slug,
-                        price: product.price,
-                        quantity: 1,
-                        image: product.images![0],
-                      }}
-                    />
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </div>
+
+          <ul className="mt-6 space-y-1 border-t pt-6 text-sm text-muted-foreground">
+            <li>Free shipping on orders over R$100</li>
+            <li>Returns within 30 days of delivery</li>
+          </ul>
         </div>
       </section>
-      <section className="mt-10">
-        <h2 className="h2-bold">Customer Reviews</h2>
+
+      <section id="reviews" className="mt-20 scroll-mt-24 border-t pt-10">
+        <h2 className="h2-bold">Customer reviews</h2>
         <ReviewList
           userId={userId || ""}
           productId={product.id}

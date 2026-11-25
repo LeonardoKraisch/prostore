@@ -1,42 +1,36 @@
-import { DollarSign, Headset, ShoppingBag, WalletCards } from "lucide-react";
-import { Card, CardContent } from "./ui/card";
+import { RotateCcw, Truck, WalletCards } from "lucide-react";
+
+const services = [
+  {
+    icon: Truck,
+    title: "Free shipping over R$100",
+    text: "Orders below that ship for a flat R$10.",
+  },
+  {
+    icon: RotateCcw,
+    title: "30-day returns",
+    text: "Wrong size? Send it back within 30 days of delivery.",
+  },
+  {
+    icon: WalletCards,
+    title: "Pay your way",
+    text: "Card via Stripe, PayPal or cash on delivery.",
+  },
+];
 
 const IconBoxes = () => {
   return (
-    <div>
-      <Card>
-        <CardContent className="grid md:grid-cols-4 gap-4 p-4">
-          <div className="space-y-2">
-            <ShoppingBag />
-            <div className="text-sm font-bold">Free Shipping</div>
-            <div className="text-sm text-muted-foreground">
-              Free shipping on orders above R$100
-            </div>
+    <section className="my-16 grid gap-8 border-y py-8 md:grid-cols-3 md:gap-0 md:divide-x">
+      {services.map(({ icon: Icon, title, text }) => (
+        <div key={title} className="flex gap-4 md:px-8 md:first:pl-0">
+          <Icon className="mt-0.5 size-5 shrink-0 text-primary" aria-hidden />
+          <div>
+            <h3 className="font-medium">{title}</h3>
+            <p className="mt-1 text-sm text-muted-foreground">{text}</p>
           </div>
-          <div className="space-y-2">
-            <DollarSign />
-            <div className="text-sm font-bold">Money Back Guarantee</div>
-            <div className="text-sm text-muted-foreground">
-              Within 30 days of purchase
-            </div>
-          </div>
-          <div className="space-y-2">
-            <WalletCards />
-            <div className="text-sm font-bold">Flexible Payment</div>
-            <div className="text-sm text-muted-foreground">
-              Pay with credit card, PayPal or COD
-            </div>
-          </div>
-          <div className="space-y-2">
-            <Headset />
-            <div className="text-sm font-bold">24/7 Support</div>
-            <div className="text-sm text-muted-foreground">
-              Get support at any time
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-    </div>
+        </div>
+      ))}
+    </section>
   );
 };
 

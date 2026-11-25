@@ -3,43 +3,57 @@ import { useState } from "react";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 
-const ProductImages = ({ images }: { images: string[] }) => {
-  const [mainImage, setMainImage] = useState(images[0]);
+const ProductImages = ({
+  images,
+  name,
+}: {
+  images: string[];
+  name: string;
+}) => {
+  const [current, setCurrent] = useState(0);
 
   return (
-    <>
-      <div className="space-y-4">
+    <div className="space-y-3">
+      <div className="pinstripe overflow-hidden rounded-md">
         <Image
-          src={mainImage}
-          alt="Product Image"
+          src={images[current]}
+          alt={name}
           width={1000}
           height={1000}
-          className="min-h-[300px]"
-          object-cover
-          object-center
+          priority
+          sizes="(min-width: 768px) 55vw, 100vw"
+          className="aspect-square w-full object-contain p-6 mix-blend-multiply dark:mix-blend-normal"
         />
       </div>
-      <div className="flex">
-        {images.map((image, index) => (
-          <div
-            key={index}
-            className={cn(
-              "border mr-2 cursor-pointer hover:border-orange-600",
-              mainImage === image && "border-orange-500",
-            )}
-          >
-            <Image
-              key={index}
-              src={image}
-              alt={`Product Image ${index + 1}`}
-              width={100}
-              height={100}
-              onClick={() => setMainImage(image)}
-            />
-          </div>
-        ))}
-      </div>
-    </>
+      {images.length > 1 && (
+        <div className="flex gap-3" role="list" aria-label="Product photos">
+          {images.map((image, index) => (
+            <button
+              key={image}
+              type="button"
+              role="listitem"
+              onClick={() => setCurrent(index)}
+              aria-label={`Show photo ${index + 1} of ${images.length}`}
+              aria-current={current === index}
+              className={cn(
+                "overflow-hidden rounded bg-panel ring-offset-2 ring-offset-background transition-shadow",
+                current === index
+                  ? "ring-2 ring-primary"
+                  : "ring-1 ring-border hover:ring-primary/50",
+              )}
+            >
+              <Image
+                src={image}
+                alt=""
+                width={96}
+                height={96}
+                className="size-20 object-contain mix-blend-multiply dark:mix-blend-normal"
+              />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
   );
 };
 

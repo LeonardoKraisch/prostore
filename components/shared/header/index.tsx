@@ -1,32 +1,52 @@
 import Image from "next/image";
 import Link from "next/link";
 import { APP_NAME } from "@/lib/constants";
+import { getAllCategories } from "@/lib/actions/product.actions";
 import Menu from "./menu";
 import CategoryDrawer from "./category-drawer";
 import Search from "./search";
 
-const Header = () => {
+const Header = async () => {
+  const categories = await getAllCategories();
+
   return (
-    <header className="w-full border-b">
-      <div className="wrapper flex-between">
-        <div className="flex-start">
+    <header className="sticky top-0 z-40 w-full border-b bg-background/90 backdrop-blur supports-[backdrop-filter]:bg-background/75">
+      <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-5 md:px-10">
+        <div className="md:hidden">
           <CategoryDrawer />
-          <Link href="/" className="flex-start ml-4">
-            <Image
-              src="/images/logo.svg"
-              alt={`${APP_NAME} Logo`}
-              width={40}
-              height={40}
-            />
-            <span className="hidden lg:block font-bold text-2xl ml-3">
-              {APP_NAME}
-            </span>
-          </Link>
         </div>
-        <div className="hidden md:block">
+        <Link href="/" className="flex shrink-0 items-center gap-2">
+          <Image
+            src="/images/logo.svg"
+            alt=""
+            width={32}
+            height={32}
+            priority
+          />
+          <span className="font-display text-xl font-bold tracking-tight text-primary">
+            {APP_NAME}
+          </span>
+        </Link>
+        <nav aria-label="Categories" className="ml-4 hidden lg:block">
+          <ul className="flex items-center gap-5 text-sm">
+            {categories.map((c) => (
+              <li key={c.category}>
+                <Link
+                  href={`/search?category=${encodeURIComponent(c.category)}`}
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  {c.category}
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </nav>
+        <div className="ml-auto hidden md:block">
           <Search />
         </div>
-        <Menu />
+        <div className="ml-auto md:ml-0">
+          <Menu />
+        </div>
       </div>
     </header>
   );

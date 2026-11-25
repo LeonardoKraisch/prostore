@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
+import { Bricolage_Grotesque } from "next/font/google";
 import "../assets/styles/globals.css";
 import { APP_DESCRIPTION, APP_NAME, SERVER_URL } from "@/lib/constants";
 import { ThemeProvider } from "next-themes";
@@ -14,6 +15,12 @@ const inter = localFont({
     { path: "../public/fonts/inter/Inter-Bold.woff2", weight: "700" },
   ],
   variable: "--font-inter",
+  display: "swap",
+});
+
+const display = Bricolage_Grotesque({
+  subsets: ["latin"],
+  variable: "--font-display",
   display: "swap",
 });
 
@@ -40,10 +47,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={`${inter.variable} antialiased`}>
+      <body className={`${inter.variable} ${display.variable} antialiased`}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="dark"
+          defaultTheme="system"
           enableSystem
           disableTransitionOnChange
         >

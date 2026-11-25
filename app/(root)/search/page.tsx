@@ -80,7 +80,41 @@ const ratings = [
   },
 ];
 
-const sortOrders = ["newest", "lowest", "rating", "highest"];
+const sortOrders = [
+  { value: "newest", label: "Newest" },
+  { value: "lowest", label: "Price: low to high" },
+  { value: "highest", label: "Price: high to low" },
+  { value: "rating", label: "Top rated" },
+];
+
+const FilterGroup = ({
+  title,
+  items,
+}: {
+  title: string;
+  items: { label: string; href: string; active: boolean }[];
+}) => (
+  <div>
+    <h2 className="mb-2 text-sm font-semibold">{title}</h2>
+    <ul className="space-y-0.5">
+      {items.map((item) => (
+        <li key={item.href}>
+          <Link
+            href={item.href}
+            aria-current={item.active ? "true" : undefined}
+            className={
+              item.active
+                ? "block rounded px-2 py-1 text-sm font-medium bg-secondary text-secondary-foreground"
+                : "block rounded px-2 py-1 text-sm text-muted-foreground hover:text-foreground"
+            }
+          >
+            {item.label}
+          </Link>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 const SearchPage = async (props: {
   searchParams: Promise<{
@@ -139,122 +173,151 @@ const SearchPage = async (props: {
     rating: rating,
     sort: sort,
     page: Number(page),
+    limit: 12,
   });
-  return (
-    <div className="grid md:grid-cols-5 md:gap-5">
-      <div className="filter-links">
-        <div className="text-xl mb-2 mt-3">Department</div>
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                href={getFilterUrl({ c: "all" })}
-                className={`${(category === "all" || category === "") && "font-bold"}`}
-              >
-                Any
-              </Link>
-            </li>
-            {categories.map((c) => (
-              <li key={c.category}>
-                <Link
-                  href={getFilterUrl({ c: String(c.category) })}
-                  className={`${category === String(c.category) && "font-bold"}`}
-                >
-                  {c.category}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="text-xl mb-2 mt-8">Price</div>
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                href={getFilterUrl({ p: "all" })}
-                className={`${price === "all" && "font-bold"}`}
-              >
-                Any
-              </Link>
-            </li>
-            {prices.map((p) => (
-              <li key={p.value}>
-                <Link
-                  href={getFilterUrl({ p: String(p.value) })}
-                  className={`${price === p.value && "font-bold"}`}
-                >
-                  {p.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-        <div className="text-xl mb-2 mt-8">Customer Ratings</div>
-        <div>
-          <ul className="space-y-1">
-            <li>
-              <Link
-                href={getFilterUrl({ r: "all" })}
-                className={`${rating === "all" && "font-bold"}`}
-              >
-                Any
-              </Link>
-            </li>
-            {ratings.map((r) => (
-              <li key={r.value}>
-                <Link
-                  href={getFilterUrl({ r: String(r.value) })}
-                  className={`${rating === r.value && "font-bold"}`}
-                >
-                  {r.name}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+  const isSet = (v: string) => v !== "all" && v !== "";
+  const hasFilters = [q, category, price, rating].some(isSet);
+  const activeFilters = [
+    isSet(q) && isSet(category) && `“${q}”`,
+    isSet(price) && prices.find((p) => p.value === price)?.name,
+    isSet(rating) && ratings.find((r) => r.value === rating)?.name,
+  ].filter(Boolean) as string[];
 
-      <div className="md:col-span-4 space-y-4">
-        <div className="flex-between flex-col md:flex-row my-4">
-          <div className="flex items-center">
-            {q !== "all" && q !== "" && "Query: " + q}
-            {category !== "all" && category !== "" && " Category: " + category}
-            {price !== "all" && price !== "" && " Price: " + price}
-            {rating !== "all" &&
-              rating !== "" &&
-              " Rating: " + rating + " Stars & Up"}
-            &nbsp;
-            {(q !== "all" && q !== "") ||
-            (category !== "all" && category !== "") ||
-            (price !== "all" && price !== "") ||
-            (rating !== "all" && rating !== "") ? (
-              <Button asChild variant={"link"}>
-                <Link href="/search">Clear</Link>
-              </Button>
-            ) : null}
-          </div>
+  const heading = isSet(category)
+    ? category
+    : isSet(q)
+      ? `Results for “${q}”`
+      : "All products";
+
+  return (
+    <div className="grid gap-8 md:grid-cols-[200px_1fr] lg:gap-12">
+      <aside className="space-y-6 md:pt-2" aria-label="Filters">
+        <FilterGroup
+          title="Category"
+          items={[
+            {
+              label: "All",
+              href: getFilterUrl({ c: "all" }),
+              active: !isSet(category),
+            },
+            ...categories.map((c) => ({
+              label: c.category,
+              href: getFilterUrl({ c: String(c.category) }),
+              active: category === String(c.category),
+            })),
+          ]}
+        />
+        <FilterGroup
+          title="Price"
+          items={[
+            { label: "Any", href: getFilterUrl({ p: "all" }), active: !isSet(price) },
+            ...prices.map((p) => ({
+              label: p.name,
+              href: getFilterUrl({ p: p.value }),
+              active: price === p.value,
+            })),
+          ]}
+        />
+        <FilterGroup
+          title="Customer rating"
+          items={[
+            { label: "Any", href: getFilterUrl({ r: "all" }), active: !isSet(rating) },
+            ...ratings.map((r) => ({
+              label: r.name,
+              href: getFilterUrl({ r: r.value }),
+              active: rating === r.value,
+            })),
+          ]}
+        />
+      </aside>
+
+      <div>
+        <div className="flex flex-col gap-4 border-b pb-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            Sort by{" "}
+            <h1 className="h2-bold">{heading}</h1>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {products.totalCount === 0
+                ? "No products"
+                : `${products.totalCount} ${products.totalCount === 1 ? "product" : "products"}`}
+              {activeFilters.length > 0 && ` for ${activeFilters.join(", ")}`}
+              {hasFilters && (
+                <>
+                  {" "}
+                  <Link
+                    href="/search"
+                    className="font-medium text-primary underline-offset-4 hover:underline"
+                  >
+                    Clear filters
+                  </Link>
+                </>
+              )}
+            </p>
+          </div>
+          <nav aria-label="Sort" className="flex flex-wrap gap-1 text-sm">
             {sortOrders.map((s) => (
               <Link
-                key={s}
-                href={getFilterUrl({ s })}
-                className={`mx-2 ${sort === s && "font-bold"}`}
+                key={s.value}
+                href={getFilterUrl({ s: s.value })}
+                aria-current={sort === s.value ? "true" : undefined}
+                className={
+                  sort === s.value
+                    ? "rounded-full bg-primary px-3 py-1 font-medium text-primary-foreground"
+                    : "rounded-full px-3 py-1 text-muted-foreground hover:bg-secondary hover:text-foreground"
+                }
               >
-                {s}
+                {s.label}
               </Link>
             ))}
+          </nav>
+        </div>
+
+        {products.data.length === 0 ? (
+          <div className="py-16 text-center">
+            <p className="font-display text-xl font-semibold">
+              Nothing matches these filters
+            </p>
+            <p className="mt-2 text-muted-foreground">
+              Try a different category or price range.
+            </p>
+            <Button asChild className="mt-6">
+              <Link href="/search">Clear filters</Link>
+            </Button>
           </div>
-        </div>
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
-          {products.data.length === 0 ? (
-            <div>No products found</div>
-          ) : (
-            products.data.map((product) => (
-              <ProductCard key={product.id} product={product} />
-            ))
-          )}
-        </div>
+        ) : (
+          <div className="mt-8 grid grid-cols-2 gap-x-4 gap-y-8 lg:grid-cols-3">
+            {products.data.map((product, index) => (
+              <ProductCard
+                key={product.id}
+                product={product}
+                priority={index < 3}
+              />
+            ))}
+          </div>
+        )}
+
+        {products.totalPages > 1 && (
+          <nav
+            aria-label="Pagination"
+            className="mt-12 flex items-center justify-center gap-2 text-sm"
+          >
+            {Array.from({ length: products.totalPages }, (_, i) => i + 1).map(
+              (n) => (
+                <Link
+                  key={n}
+                  href={getFilterUrl({ pg: String(n) })}
+                  aria-current={Number(page) === n ? "page" : undefined}
+                  className={
+                    Number(page) === n
+                      ? "flex size-9 items-center justify-center rounded-full bg-primary font-medium text-primary-foreground"
+                      : "flex size-9 items-center justify-center rounded-full text-muted-foreground hover:bg-secondary"
+                  }
+                >
+                  {n}
+                </Link>
+              ),
+            )}
+          </nav>
+        )}
       </div>
     </div>
   );

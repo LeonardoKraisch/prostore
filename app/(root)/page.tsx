@@ -1,25 +1,31 @@
-import ProductCarousel from "@/components/shared/product/product-carousel";
 import ProductList from "@/components/shared/product/product-list";
-import ViewAllProductsButton from "@/components/view-all-products-button";
 import {
   getLatestProducts,
   getFeaturedProducts,
+  getCategoryShowcase,
 } from "@/lib/actions/product.actions";
 import IconBoxes from "@/components/icon-boxes";
-import DealCountdown from "@/components/deal-countdown";
+import Hero from "@/components/home/hero";
+import CategoryShowcase from "@/components/home/category-showcase";
 
 const Homepage = async () => {
-  const latestProducts = await getLatestProducts();
-  const featuredProducts = await getFeaturedProducts();
+  const [latestProducts, featuredProducts, categories] = await Promise.all([
+    getLatestProducts(),
+    getFeaturedProducts(),
+    getCategoryShowcase(),
+  ]);
+
+  const heroProduct = featuredProducts[0] ?? latestProducts[0];
 
   return (
     <>
-      {featuredProducts && featuredProducts.length > 0 && (
-        <ProductCarousel data={featuredProducts} />
-      )}
-      <ProductList data={latestProducts} title="Newest Arrivals" />
-      <ViewAllProductsButton />
-      <DealCountdown />
+      <Hero product={heroProduct} />
+      <ProductList
+        data={latestProducts}
+        title="New arrivals"
+        viewAllHref="/search"
+      />
+      <CategoryShowcase categories={categories} />
       <IconBoxes />
     </>
   );

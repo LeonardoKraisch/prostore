@@ -84,13 +84,15 @@ export async function getAllProducts({
         }
       : {};
 
+  const where: Prisma.ProductWhereInput = {
+    ...queryFilter,
+    ...categoryFilter,
+    ...priceFilter,
+    ...ratingFilter,
+  };
+
   const data = await prisma.product.findMany({
-    where: {
-      ...queryFilter,
-      ...categoryFilter,
-      ...priceFilter,
-      ...ratingFilter,
-    },
+    where,
     orderBy:
       sort === "lowest"
         ? { price: "asc" }
@@ -103,10 +105,11 @@ export async function getAllProducts({
     take: limit,
   });
 
-  const dataCount = await prisma.product.count();
+  const dataCount = await prisma.product.count({ where });
 
   return {
     data,
+    totalCount: dataCount,
     totalPages: Math.ceil(dataCount / limit),
   };
 }
@@ -187,4 +190,28 @@ export async function getFeaturedProducts() {
   });
 
   return convertToPlainObject(data);
+}
+
+// Uma vitrine por categoria: nome, quantidade e a imagem do produto mais recente.
+export async function getCategoryShowcase() {
+  const categories = await prisma.product.groupBy({
+    by: ["category"],
+    _count: true,
+    orderBy: { category: "asc" },
+  });
+
+  return Promise.all(
+    categories.map(async (c) => {
+      const product = await prisma.product.findFirst({
+        where: { category: c.category },
+        orderBy: { createdAt: "desc" },
+        select: { images: true },
+      });
+      return {
+        category: c.category,
+        count: c._count,
+        image: product?.images[0] ?? null,
+      };
+    }),
+  );
 }

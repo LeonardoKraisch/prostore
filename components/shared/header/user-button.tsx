@@ -15,9 +15,9 @@ const UserButton = async () => {
   const session = await auth();
   if (!session) {
     return (
-      <Button asChild>
+      <Button asChild variant="ghost" size="sm">
         <Link href="/sign-in">
-          <UserIcon /> Sign In
+          <UserIcon /> <span className="hidden sm:inline">Sign in</span>
         </Link>
       </Button>
     );
@@ -32,7 +32,8 @@ const UserButton = async () => {
           <div className="flex items-center">
             <Button
               variant="ghost"
-              className="relative h-8 w-8 rounded-full ml-2 flex items-center justify-center bg-gray-200"
+              className="relative ml-1 flex h-8 w-8 items-center justify-center rounded-full bg-secondary font-display font-semibold text-secondary-foreground"
+              aria-label="Account menu"
             >
               {firstInitial}
             </Button>
@@ -52,26 +53,23 @@ const UserButton = async () => {
             </div>
           </DropdownMenuLabel>
           <DropdownMenuItem>
-            <Link href="/user/profile">User Profile</Link>
+            <Link href="/user/profile">Profile</Link>
           </DropdownMenuItem>
           <DropdownMenuItem>
-            <Link href="/user/orders">Order History</Link>
+            <Link href="/user/orders">Orders</Link>
           </DropdownMenuItem>
           {session?.user?.role === "admin" && (
             <DropdownMenuItem>
               <Link href="/admin/overview">Admin</Link>
             </DropdownMenuItem>
           )}
-          <DropdownMenuItem>
-            <Link href="/settings">Settings</Link>
-          </DropdownMenuItem>
           <DropdownMenuItem className="p-0 mb-1">
             <form action={signOutUser} className="w-full">
               <Button
                 className="w-full py-4 px-2 h-4 justify-start"
                 variant="ghost"
               >
-                Sign Out
+                Sign out
               </Button>
             </form>
           </DropdownMenuItem>

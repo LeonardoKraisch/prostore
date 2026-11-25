@@ -34,11 +34,11 @@ const AddToCart = ({
         description: response.message,
         action: (
           <ToastAction
-            className="bg-primary text-white hover:bg-gray-800"
-            altText="View Cart"
+            className="bg-primary text-primary-foreground hover:bg-primary/90"
+            altText="View cart"
             onClick={() => router.push("/cart")}
           >
-            View Cart
+            View cart
           </ToastAction>
         ),
       });
@@ -59,16 +59,30 @@ const AddToCart = ({
   const existItem =
     cart && cart.items.find((x) => x.productId === item.productId);
   return existItem ? (
-    <div>
-      <Button variant="outline" type="button" onClick={handleRemoveFromCart}>
+    <div className="flex items-center gap-3">
+      <Button
+        variant="outline"
+        size="icon"
+        type="button"
+        onClick={handleRemoveFromCart}
+        aria-label="Remove one"
+      >
         {isPending ? (
           <Loader className="w-4 h-4 animate-spin" />
         ) : (
           <Minus className="h-4 w-4" />
         )}
       </Button>
-      <span className="px-2">{existItem.quantity}</span>
-      <Button variant="outline" type="button" onClick={handleAddToCart}>
+      <span className="min-w-6 text-center font-medium" aria-live="polite">
+        {existItem.quantity}
+      </span>
+      <Button
+        variant="outline"
+        size="icon"
+        type="button"
+        onClick={handleAddToCart}
+        aria-label="Add one more"
+      >
         {isPending ? (
           <Loader className="w-4 h-4 animate-spin" />
         ) : (
@@ -77,9 +91,15 @@ const AddToCart = ({
       </Button>
     </div>
   ) : (
-    <Button className="w-full" type="button" onClick={handleAddToCart}>
-      {isPending ? <Loader className="w-4 h-4 animate-spin" /> : <Plus />} Add
-      to Cart
+    <Button
+      className="w-full"
+      size="lg"
+      type="button"
+      onClick={handleAddToCart}
+      disabled={isPending}
+    >
+      {isPending && <Loader className="h-4 w-4 animate-spin" />}
+      Add to cart
     </Button>
   );
 };

@@ -1,39 +1,61 @@
 import Link from "next/link";
 import Image from "next/image";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import ProductPrice from "./product-price";
 import { ProductProps } from "@/types";
+import { formatCurrency } from "@/lib/utils";
 import Rating from "./reviews";
 
-const ProductCard = ({ product }: { product: ProductProps }) => {
+const ProductCard = ({
+  product,
+  priority = false,
+}: {
+  product: ProductProps;
+  priority?: boolean;
+}) => {
+  const inStock = product.stock > 0;
+
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader className="p-0 items-center">
-        <Link href={`/product/${product.slug}`}>
-          <Image
-            src={product.images[0]}
-            alt={product.name}
-            width={300}
-            height={300}
-            priority={true}
-          />
-        </Link>
-      </CardHeader>
-      <CardContent className="p-4 grid gap-4">
-        <div className="text-xs">{product.brand}</div>
-        <Link href={`/product/${product.slug}`}>
-          <h2 className="text-sm font-medium">{product.name}</h2>
-        </Link>
-        <div className="flex-between gap-4">
-          <Rating value={Number(product.rating)} />
-          {product.stock > 0 ? (
-            <ProductPrice price={Number(product.price)} />
-          ) : (
-            <p className="text-destructive">Out of Stock</p>
-          )}
+    <article className="group relative flex flex-col">
+      <Link
+        href={`/product/${product.slug}`}
+        className="relative block overflow-hidden rounded-md bg-panel"
+      >
+        <Image
+          src={product.images[0]}
+          alt={product.name}
+          width={600}
+          height={600}
+          sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
+          priority={priority}
+          className="aspect-square w-full object-cover mix-blend-multiply dark:mix-blend-normal"
+        />
+        {/* Etiqueta tecida com o preço */}
+        <span className="woven-label absolute bottom-3 left-3">
+          <span className="text-[11px] leading-tight text-muted-foreground">
+            {product.brand}
+          </span>
+          <span className="font-display text-base font-semibold leading-tight">
+            {inStock ? formatCurrency(product.price) : "Sold out"}
+          </span>
+        </span>
+      </Link>
+      <div className="mt-3 space-y-1">
+        <h3 className="text-sm font-medium leading-snug">
+          <Link
+            href={`/product/${product.slug}`}
+            className="underline-offset-4 group-hover:underline"
+          >
+            {product.name}
+          </Link>
+        </h3>
+        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+          <Rating value={Number(product.rating)} size="sm" />
+          <span>
+            {product.numReviews}{" "}
+            {product.numReviews === 1 ? "review" : "reviews"}
+          </span>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+    </article>
   );
 };
 
