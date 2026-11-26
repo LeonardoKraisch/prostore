@@ -9,6 +9,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { signInWithCredentials } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
+import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 const CredentialsSignInForm = () => {
   const [data, action] = useActionState(signInWithCredentials, {
@@ -17,7 +18,7 @@ const CredentialsSignInForm = () => {
   });
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"));
 
   const SignInButton = () => {
     const { pending } = useFormStatus();

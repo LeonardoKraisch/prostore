@@ -9,6 +9,7 @@ import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 import { signUpUser } from "@/lib/actions/user.actions";
 import { useSearchParams } from "next/navigation";
+import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 const SignUpForm = () => {
   const [data, action] = useActionState(signUpUser, {
@@ -17,7 +18,7 @@ const SignUpForm = () => {
   });
 
   const searchParams = useSearchParams();
-  const callbackUrl = searchParams.get("callbackUrl") || "/";
+  const callbackUrl = safeCallbackUrl(searchParams.get("callbackUrl"));
 
   const SignUpButton = () => {
     const { pending } = useFormStatus();

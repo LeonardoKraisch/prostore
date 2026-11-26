@@ -96,8 +96,8 @@ export async function signUpUser(prevState: unknown, formData: FormData) {
 export async function getUserById(id: string) {
   const session = await auth();
   if (!session?.user?.id) throw new Error("User is not authenticated");
-  if (session.user.id !== id && session.user.role !== "admin") {
-    throw new Error("User is not authorized");
+  if (session.user.id !== id) {
+    await requireAdmin();
   }
   try {
     const user = await prisma.user.findFirst({

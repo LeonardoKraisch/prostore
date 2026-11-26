@@ -12,6 +12,7 @@ import { APP_NAME } from "@/lib/constants";
 import CredentialsSignInForm from "./credentials-signin-form";
 import { auth } from "@/auth";
 import { redirect } from "next/navigation";
+import { safeCallbackUrl } from "@/lib/safe-redirect";
 
 export const metadata: Metadata = {
   title: "Sign In",
@@ -25,7 +26,7 @@ const SignInPage = async (props: {
   const { callbackUrl } = await props.searchParams;
   const session = await auth();
   if (session) {
-    return redirect(callbackUrl || "/");
+    return redirect(safeCallbackUrl(callbackUrl));
   }
 
   return (

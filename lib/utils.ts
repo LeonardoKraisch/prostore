@@ -34,10 +34,17 @@ export function formatError(error: any) {
       fieldName = match[1].replace(/[`'"]/g, "");
     }
     return `${fieldName.charAt(0).toUpperCase() + fieldName.slice(1)} already exists.`;
+  } else if (
+    typeof error?.name === "string" &&
+    error.name.startsWith("PrismaClient")
+  ) {
+    // Erros do banco podem expor nomes de tabelas e consultas.
+    console.error(error);
+    return "Something went wrong. Please try again.";
   } else {
-    return typeof error.message === "string"
+    return typeof error?.message === "string"
       ? error.message
-      : JSON.stringify(error.message);
+      : "Something went wrong. Please try again.";
   }
 }
 

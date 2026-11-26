@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
     } catch (dbError: any) {
       console.error(`⚠️ Erro ao atualizar pedido:`, dbError.message);
       return NextResponse.json(
-        { message: `Database Error: ${dbError.message}` },
+        { message: "Failed to update order" },
         { status: 500 },
       );
     }
