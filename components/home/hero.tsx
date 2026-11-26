@@ -32,7 +32,7 @@ const Hero = ({ product }: { product?: ProductProps }) => {
       {product && (
         <Link
           href={`/product/${product.slug}`}
-          className="photo-panel relative block overflow-hidden rounded-md"
+          className="photo-panel relative block aspect-[4/5] overflow-hidden rounded-md sm:aspect-square"
         >
           <Image
             src={product.images[0]}
@@ -41,7 +41,7 @@ const Hero = ({ product }: { product?: ProductProps }) => {
             height={900}
             priority
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="aspect-[4/5] w-full object-cover sm:aspect-square"
+            className="absolute inset-0 size-full object-cover"
           />
           <span className="woven-label absolute bottom-5 left-5 max-w-[70%]">
             <span className="text-xs leading-tight text-muted-foreground">

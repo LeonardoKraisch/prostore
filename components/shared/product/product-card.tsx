@@ -17,7 +17,7 @@ const ProductCard = ({
     <article className="group relative flex flex-col">
       <Link
         href={`/product/${product.slug}`}
-        className="relative block overflow-hidden rounded-md photo-panel"
+        className="photo-panel relative block aspect-square overflow-hidden rounded-md"
       >
         <Image
           src={product.images[0]}
@@ -26,7 +26,7 @@ const ProductCard = ({
           height={600}
           sizes="(min-width: 1024px) 25vw, (min-width: 640px) 50vw, 100vw"
           priority={priority}
-          className="aspect-square w-full object-cover"
+          className="absolute inset-0 size-full object-cover"
         />
         {/* Etiqueta tecida com o preço */}
         <span className="woven-label absolute bottom-3 left-3">
