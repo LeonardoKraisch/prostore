@@ -18,7 +18,7 @@ const Hero = ({ product }: { product?: ProductProps }) => {
         <div className="mt-8 flex flex-wrap gap-3">
           <Button asChild size="lg">
             <Link
-              href={`/search?category=${encodeURIComponent("Men's Dress Shirts")}`}
+              href={`/search?category=${encodeURIComponent("Shirts")}`}
             >
               Shop shirts
             </Link>
@@ -41,7 +41,7 @@ const Hero = ({ product }: { product?: ProductProps }) => {
             height={900}
             priority
             sizes="(min-width: 768px) 50vw, 100vw"
-            className="aspect-[4/5] w-full object-contain p-8 sm:aspect-square"
+            className="aspect-[4/5] w-full object-cover sm:aspect-square"
           />
           <span className="woven-label absolute bottom-5 left-5 max-w-[70%]">
             <span className="text-xs leading-tight text-muted-foreground">

@@ -22,7 +22,7 @@ const ProductImages = ({
           height={1000}
           priority
           sizes="(min-width: 768px) 55vw, 100vw"
-          className="aspect-square w-full object-contain p-6"
+          className="aspect-square w-full object-cover"
         />
       </div>
       {images.length > 1 && (
@@ -47,7 +47,7 @@ const ProductImages = ({
                 alt=""
                 width={96}
                 height={96}
-                className="size-20 object-contain"
+                className="size-20 object-cover"
               />
             </button>
           ))}

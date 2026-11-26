@@ -36,15 +36,9 @@
     @apply font-display font-bold text-xl lg:text-2xl tracking-tight;
   }
 
-  /*
-   * Painel de foto: "papel de estúdio" sempre claro, nos dois temas.
-   * As fotos do catálogo têm fundo branco; o multiply as funde ao painel.
-   */
+  /* Painel de foto: fundo claro enquanto a imagem carrega, nos dois temas. */
   .photo-panel {
     background-color: hsl(212 35.1% 92.7%);
-  }
-  .photo-panel img {
-    mix-blend-mode: multiply;
   }
 
   /* Risca de giz: linhas finas verticais, como um tecido de terno. */

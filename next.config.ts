@@ -23,6 +23,8 @@ const nextConfig: NextConfig = {
       { protocol: "https", hostname: "utfs.io", port: "" },
       // UploadThing v7 serve arquivos em <appId>.ufs.sh
       { protocol: "https", hostname: "*.ufs.sh", port: "" },
+      // Fotos de produto de exemplo (licença Unsplash)
+      { protocol: "https", hostname: "images.unsplash.com", port: "" },
     ],
   },
   async headers() {

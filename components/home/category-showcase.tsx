@@ -28,7 +28,7 @@ const CategoryShowcase = ({ categories }: { categories: CategoryTile[] }) => {
                   alt=""
                   width={224}
                   height={224}
-                  className="size-full object-contain p-2"
+                  className="size-full object-cover"
                 />
               )}
             </div>

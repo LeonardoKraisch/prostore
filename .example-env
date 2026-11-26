@@ -1,0 +1,30 @@
+# Copie para .env e preencha com os seus valores. Nunca commite o .env.
+
+NEXT_PUBLIC_APP_NAME="Prostore"
+NEXT_PUBLIC_APP_DESCRIPTION="A demo shirt shop built with Next.js"
+NEXT_PUBLIC_SERVER_URL="http://localhost:3000"
+
+# Neon: URL com pooler (app) e sem pooler (migrations)
+DATABASE_URL=""
+DIRECT_URL=""
+
+# Gere com: openssl rand -base64 32
+NEXTAUTH_SECRET=""
+NEXTAUTH_URL="http://localhost:3000"
+NEXTAUTH_URL_INTERNAL="http://localhost:3000"
+
+PAYMENT_METHODS="PayPal, Stripe, CashOnDelivery"
+DEFAULT_PAYMENT_METHOD="PayPal"
+
+PAYPAL_API_URL="https://api-m.sandbox.paypal.com"
+PAYPAL_CLIENT_ID=""
+PAYPAL_SECRET=""
+
+UPLOADTHING_TOKEN=""
+
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=""
+STRIPE_SECRET_KEY=""
+STRIPE_WEBHOOK_SECRET=""
+
+RESEND_API_KEY=""
+SENDER_EMAIL="onboarding@resend.dev"

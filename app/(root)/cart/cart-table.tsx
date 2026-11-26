@@ -63,7 +63,7 @@ const CartTable = ({ cart }: { cart?: CartProps }) => {
                   alt={item.name}
                   width={96}
                   height={96}
-                  className="size-24 object-contain"
+                  className="size-24 object-cover"
                 />
               </Link>
               <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 sm:flex-row sm:items-center">
