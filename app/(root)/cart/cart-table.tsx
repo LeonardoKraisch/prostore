@@ -66,7 +66,7 @@ const CartTable = ({ cart }: { cart?: CartProps }) => {
                   className="size-24 object-contain"
                 />
               </Link>
-              <div className="flex flex-1 flex-col justify-between gap-3 sm:flex-row sm:items-center">
+              <div className="flex min-w-0 flex-1 flex-col justify-between gap-3 sm:flex-row sm:items-center">
                 <div>
                   <Link
                     href={`/product/${item.slug}`}
@@ -117,7 +117,7 @@ const CartTable = ({ cart }: { cart?: CartProps }) => {
                       )}
                     </Button>
                   </div>
-                  <p className="w-28 text-right font-display font-semibold">
+                  <p className="text-right font-display font-semibold sm:w-28">
                     {formatCurrency(Number(item.price) * item.quantity)}
                   </p>
                 </div>
