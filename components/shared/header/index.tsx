@@ -1,8 +1,8 @@
-import Image from "next/image";
 import Link from "next/link";
 import { APP_NAME } from "@/lib/constants";
 import { getAllCategories } from "@/lib/actions/product.actions";
 import Menu from "./menu";
+import LogoMark from "@/components/shared/logo-mark";
 import CategoryDrawer from "./category-drawer";
 import Search from "./search";
 
@@ -16,13 +16,7 @@ const Header = async () => {
           <CategoryDrawer />
         </div>
         <Link href="/" className="flex shrink-0 items-center gap-2">
-          <Image
-            src="/images/logo.svg"
-            alt=""
-            width={32}
-            height={32}
-            priority
-          />
+          <LogoMark />
           <span className="font-display text-xl font-bold tracking-tight text-primary">
             {APP_NAME}
           </span>

@@ -36,13 +36,23 @@
     @apply font-display font-bold text-xl lg:text-2xl tracking-tight;
   }
 
-  /* Risca de giz: linhas finas verticais, como um tecido listrado. */
+  /*
+   * Painel de foto: "papel de estúdio" sempre claro, nos dois temas.
+   * As fotos do catálogo têm fundo branco; o multiply as funde ao painel.
+   */
+  .photo-panel {
+    background-color: hsl(212 35.1% 92.7%);
+  }
+  .photo-panel img {
+    mix-blend-mode: multiply;
+  }
+
+  /* Risca de giz: linhas finas verticais, como um tecido de terno. */
   .pinstripe {
-    background-color: hsl(var(--panel));
     background-image: repeating-linear-gradient(
       90deg,
-      hsl(var(--seam) / 0.9) 0 1px,
-      transparent 1px 18px
+      hsl(0 0% 100% / 0.06) 0 1px,
+      transparent 1px 14px
     );
   }
 

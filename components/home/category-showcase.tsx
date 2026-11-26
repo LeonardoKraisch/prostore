@@ -8,7 +8,8 @@ type CategoryTile = {
 };
 
 const CategoryShowcase = ({ categories }: { categories: CategoryTile[] }) => {
-  if (categories.length === 0) return null;
+  // Uma categoria só não justifica a seção.
+  if (categories.length < 2) return null;
 
   return (
     <section className="my-16">
@@ -20,14 +21,14 @@ const CategoryShowcase = ({ categories }: { categories: CategoryTile[] }) => {
             href={`/search?category=${encodeURIComponent(c.category)}`}
             className="group flex items-center gap-5 rounded-md border bg-card p-4 transition-colors hover:border-primary"
           >
-            <div className="pinstripe size-24 shrink-0 overflow-hidden rounded sm:size-28">
+            <div className="photo-panel size-24 shrink-0 overflow-hidden rounded sm:size-28">
               {c.image && (
                 <Image
                   src={c.image}
                   alt=""
                   width={224}
                   height={224}
-                  className="size-full object-contain p-2 mix-blend-multiply dark:mix-blend-normal"
+                  className="size-full object-contain p-2"
                 />
               )}
             </div>

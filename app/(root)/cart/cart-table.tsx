@@ -56,14 +56,14 @@ const CartTable = ({ cart }: { cart?: CartProps }) => {
             <li key={item.slug} className="flex gap-4 py-5">
               <Link
                 href={`/product/${item.slug}`}
-                className="shrink-0 overflow-hidden rounded bg-panel"
+                className="shrink-0 overflow-hidden rounded photo-panel"
               >
                 <Image
                   src={item.image}
                   alt={item.name}
                   width={96}
                   height={96}
-                  className="size-24 object-contain mix-blend-multiply dark:mix-blend-normal"
+                  className="size-24 object-contain"
                 />
               </Link>
               <div className="flex flex-1 flex-col justify-between gap-3 sm:flex-row sm:items-center">

@@ -7,7 +7,7 @@ const Footer = async () => {
   const categories = await getAllCategories();
 
   return (
-    <footer className="mt-16 bg-primary text-primary-foreground dark:bg-card dark:text-card-foreground">
+    <footer className="pinstripe mt-8 bg-[hsl(216_48.7%_22.9%)] text-[hsl(216_38.5%_97.5%)] dark:bg-card dark:text-card-foreground">
       <div className="mx-auto grid max-w-7xl gap-10 px-5 py-12 md:grid-cols-4 md:px-10">
         <div className="md:col-span-2">
           <p className="font-display text-2xl font-bold tracking-tight">
@@ -59,7 +59,7 @@ const Footer = async () => {
           </ul>
         </nav>
       </div>
-      <div className="border-t border-primary-foreground/15 dark:border-border">
+      <div className="border-t border-white/15 dark:border-border">
         <p className="mx-auto max-w-7xl px-5 py-5 text-xs opacity-70 md:px-10">
           © {currentYear} {APP_NAME}. Portfolio project.
         </p>

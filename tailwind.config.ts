@@ -22,7 +22,6 @@ const config: Config = {
   			display: ['var(--font-display)', 'var(--font-inter)', 'sans-serif']
   		},
   		colors: {
-  			panel: 'hsl(var(--panel))',
   			seam: 'hsl(var(--seam))',
   			thread: 'hsl(var(--thread))',
   			border: 'hsl(var(--border))',

@@ -14,7 +14,7 @@ const ProductImages = ({
 
   return (
     <div className="space-y-3">
-      <div className="pinstripe overflow-hidden rounded-md">
+      <div className="photo-panel overflow-hidden rounded-md">
         <Image
           src={images[current]}
           alt={name}
@@ -22,7 +22,7 @@ const ProductImages = ({
           height={1000}
           priority
           sizes="(min-width: 768px) 55vw, 100vw"
-          className="aspect-square w-full object-contain p-6 mix-blend-multiply dark:mix-blend-normal"
+          className="aspect-square w-full object-contain p-6"
         />
       </div>
       {images.length > 1 && (
@@ -36,7 +36,7 @@ const ProductImages = ({
               aria-label={`Show photo ${index + 1} of ${images.length}`}
               aria-current={current === index}
               className={cn(
-                "overflow-hidden rounded bg-panel ring-offset-2 ring-offset-background transition-shadow",
+                "overflow-hidden rounded photo-panel ring-offset-2 ring-offset-background transition-shadow",
                 current === index
                   ? "ring-2 ring-primary"
                   : "ring-1 ring-border hover:ring-primary/50",
@@ -47,7 +47,7 @@ const ProductImages = ({
                 alt=""
                 width={96}
                 height={96}
-                className="size-20 object-contain mix-blend-multiply dark:mix-blend-normal"
+                className="size-20 object-contain"
               />
             </button>
           ))}
